@@ -13,3 +13,7 @@ environments such as development, testing, staging, and production.  It is:
 
 The "Drubs" name is a hat-tip to the indespensible Drush.  Drupal is a
 registered trademark of Dries Buytaert.
+
+# Roadmap
+
+Drubs is presently in pre-alpha development and not suitable for use.
