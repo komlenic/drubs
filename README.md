@@ -17,3 +17,5 @@ registered trademark of Dries Buytaert.
 ## Roadmap
 
 Drubs is presently in pre-alpha development and not suitable for use.
+
+For more information email drubs@drubs.org or follow @drubscli on twitter.
