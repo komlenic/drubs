@@ -14,8 +14,8 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-# with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-#     long_description = f.read()
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name = 'Drubs',
@@ -25,43 +25,29 @@ setup(
     # https://packaging.python.org/en/latest/single_source_version.html
     version = '0.1.0',
 
-    description = 'A Drupal build system',
-    long_description = 'A command-line tool tool for building, deploying, and managing Drupal sites across multiple servers and environments.',
-
-    # The project's main homepage.
+    description = 'A command-line tool tool for building, deploying, and managing Drupal sites across multiple servers and environments.',
+    long_description = long_description,
     url='http://drubs.org',
-
-    # Author details
     author='Chris Komlenic',
     author_email='komlenic@gmail.com',
-
-    # Choose your license
     license='GNU GPL',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        # How mature is this project? Common values are
-        #   3 - Alpha
-        #   4 - Beta
-        #   5 - Production/Stable
         'Development Status :: 2 - Pre-Alpha',
-
-        # Indicate who your project is intended for
+        'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
+        'Topic :: Software Development',
         'Topic :: Software Development :: Build Tools',
+        'Topic :: System :: Clustering',
+        'Topic :: System :: Software Distribution',
+        'Topic :: System :: Systems Administration',
         'Topic :: Internet :: WWW/HTTP :: Site Management',
-
-        # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
-
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2 :: Only',
         'Programming Language :: Python :: 2.7',
-
         'Operating System :: POSIX :: Linux',
-
     ],
 
     # What does your project relate to?
