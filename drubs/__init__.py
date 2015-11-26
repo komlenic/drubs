@@ -19,6 +19,11 @@ def main():
   parser.add_argument('-d', '--debug', action='store_const', const='1', default='0', help='print debug output from drush commands, if available')
   parser.add_argument('-c' , '--cache', action='store_const', const='1', default='0', help='use drush cache of projects when building sites, where available')
   parser.add_argument('--version', action='version', version='%(prog)s 0.1.0')
+
+  # Print help if no arguments are supplied.
+  if len(sys.argv)==1:
+    parser.print_help()
+    sys.exit(1)
   args = parser.parse_args()
 
   pprint(args)
