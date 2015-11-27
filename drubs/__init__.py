@@ -1,7 +1,7 @@
 import sys
 import argparse
 import textwrap
-from pprint import pprint
+import drubs
 from fabric.colors import red, yellow, green, cyan
 
 def main():
@@ -30,6 +30,7 @@ def main():
         update   Update the project on the specified nodes (data safe*)
         disable  Put specified nodes into Drupal's 'maintenance mode'
         enable   Turns off Drupal's maintenance mode (if on)
+        destroy  Completely deletes the project from the specified nodes
 
       Example commands:
 
@@ -62,6 +63,6 @@ def main():
   if len(sys.argv)==1:
     parser.print_help()
     sys.exit(1)
-  args = parser.parse_args()
 
-  pprint(args)
+  args = parser.parse_args()
+  drubs.drubs(args)
