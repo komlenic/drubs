@@ -94,7 +94,7 @@ class Node(object):
     '''
     Installs a site/project, based on .make and .py configuration files.
     '''
-    pass
+    self.provision()
 
 
   def update(self):
@@ -144,9 +144,31 @@ class Node(object):
 
 
   def drush(self, cmd):
+    '''
+    Runs the specified drush command.
+    '''
     if env.verbose:
       cmd += ' -v'
     if env.debug:
       cmd += ' -d'
     with env.cd(env.node['site_root']):
       self.drubs_run('drush %s -y' % (cmd))
+
+
+  def provision(self):
+    '''
+    Creates database and site root.
+    '''
+    print(cyan('Creating database...'))
+    self.drubs_run('mysql -h%s -u%s -p%s -e "DROP DATABASE IF EXISTS %s;CREATE DATABASE %s;"' % (
+      env.node['db_host'],
+      env.node['db_user'],
+      env.node['db_pass'],
+      env.node['db_name'],
+      env.node['db_name'],
+    ))
+    print(cyan('Creating site root location...'))
+    if env.exists(env.node['site_root'] + '/sites/default'):
+      self.drubs_run('chmod -R u+w %s/sites/default' % (env.node['site_root']))
+      self.drubs_run('rm -rf %s' % (env.node['site_root']))
+    self.drubs_run('mkdir -p %s' % (env.node['site_root']))
