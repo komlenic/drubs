@@ -1,4 +1,5 @@
 import subprocess
+import time
 from fabric.state import env
 from fabric.operations import local
 from fabric.api import lcd, cd, run, task, hosts, quiet, runs_once
@@ -39,6 +40,9 @@ class Node(object):
 
     # Set env.node, a shortcut.
     env.node = env.config['nodes'][env.node_name]
+
+    # Start a timer, used later by print_elapsed_time().
+    env.start_time = time.time()
 
 
   def drubs_run(self, cmd, *args, **kwargs):
@@ -84,10 +88,12 @@ class Node(object):
     Creates stubbed-out versions of project configuration files.
     '''
     pass
+    self.print_elapsed_time()
 
 
   def status(self):
     self.drubs_run('uname')
+    self.print_elapsed_time()
 
 
   def install(self):
@@ -95,27 +101,29 @@ class Node(object):
     Installs a site/project, based on .make and .py configuration files.
     '''
     self.provision()
+    self.print_elapsed_time()
+
 
 
   def update(self):
     '''
     Updataes a site/project, based on .make and .py configuration files.
     '''
-    pass
+    self.print_elapsed_time()
 
 
   def disable(self):
     '''
     Disables a site using Drupal's maintenance mode.
     '''
-    pass
+    self.print_elapsed_time()
 
 
   def enable(self):
     '''
     Enables a site by disabling Drupal's maintenance mode.
     '''
-    pass
+    self.print_elapsed_time()
 
 
   def destroy(self):
@@ -134,6 +142,7 @@ class Node(object):
       print(yellow('Site root %s does not exist.  Nothing to remove.' % (
         env.node['site_root'],
       )))
+    self.print_elapsed_time()
 
 
   def var_dump(self):
@@ -141,6 +150,7 @@ class Node(object):
     Prints the global fabric env dictionary.
     '''
     pprint(env)
+    self.print_elapsed_time()
 
 
   def drush(self, cmd):
@@ -172,3 +182,13 @@ class Node(object):
       self.drubs_run('chmod -R u+w %s/sites/default' % (env.node['site_root']))
       self.drubs_run('rm -rf %s' % (env.node['site_root']))
     self.drubs_run('mkdir -p %s' % (env.node['site_root']))
+
+
+  def print_elapsed_time(self):
+    '''
+    Prints the elapsed time.
+    '''
+    seconds = time.time() - env.start_time
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    print(cyan("Elapsed time: %dh:%02dm:%02ds" % (h, m, s)))
