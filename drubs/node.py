@@ -120,13 +120,20 @@ class Node(object):
 
   def destroy(self):
     print(cyan('Removing database...'))
-    self.drubs_run('mysql -h' + env.node['db_host'] + ' -u' + env.node['db_user'] + ' -p' + env.node['db_pass'] + ' -e "DROP DATABASE IF EXISTS ' + env.node['db_name'] + ';"')
+    self.drubs_run('mysql -h%s -u%s -p%s -e "DROP DATABASE IF EXISTS %s";' % (
+      env.node['db_host'],
+      env.node['db_user'],
+      env.node['db_pass'],
+      env.node['db_name'],
+    ))
     print(cyan('Removing files...'))
     if env.exists(env.node['site_root']):
-      self.drubs_run('chmod -R u+w ' + env.node['site_root'])
-      self.drubs_run('rm -rf ' + env.node['site_root'])
+      self.drubs_run('chmod -R u+w %s' % (env.node['site_root']))
+      self.drubs_run('rm -rf %s' % (env.node['site_root']))
     else:
-      print(yellow('Site root %s does not exist.  Nothing to remove.' % env.node['site_root']))
+      print(yellow('Site root %s does not exist.  Nothing to remove.' % (
+        env.node['site_root'],
+      )))
 
 
   def var_dump(self):
@@ -134,3 +141,12 @@ class Node(object):
     Prints the global fabric env dictionary.
     '''
     pprint(env)
+
+
+  def drush(self, cmd):
+    if env.verbose:
+      cmd += ' -v'
+    if env.debug:
+      cmd += ' -d'
+    with env.cd(env.node['site_root']):
+      self.drubs_run('drush %s -y' % (cmd))

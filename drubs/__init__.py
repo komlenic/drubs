@@ -54,9 +54,10 @@ def main():
   parser.add_argument('action', choices=['init', 'install', 'update', 'destroy', 'enable', 'disable', 'var_dump', 'status'], help='The action to perform on the specified nodes. (see descriptions above)', metavar='action')
   parser.add_argument('nodes', nargs='+', help='one or more nodes, or "all" which will perform the specified action on all valid nodes found in project.yml')
   parser.add_argument('-f', '--file', default='project.yml', help='path to project.yml file (not necessary if pwd contains the project.yml file)')
-  parser.add_argument('-v', '--verbose', action='store_const', const='1', default='0', help='print verbose output from drush commands, if available')
-  parser.add_argument('-d', '--debug', action='store_const', const='1', default='0', help='print debug output from drush commands, if available')
-  parser.add_argument('-c' , '--cache', action='store_const', const='1', default='0', help='use drush cache of projects when building sites, where available')
+  parser.add_argument('-v', '--verbose', action='store_const', const=True, default=False, help='print verbose output from drush commands, if available')
+  parser.add_argument('-d', '--debug', action='store_const', const=True, default=False, help='print debug output from drush commands, if available')
+  parser.add_argument('-c', '--cache', action='store_const', const=True, default=False, help='use drush cache of projects when building sites, where available')
+  parser.add_argument('-D', '--fab_debug', action='store_const', const=True, default=False, help='print fabric debug messages')
   parser.add_argument('--version', action='version', version='%(prog)s 0.1.0')
 
   # Print help if no arguments are supplied.

@@ -1,7 +1,7 @@
 import yaml
 import tasks
 from os.path import isfile, dirname, abspath
-from fabric.state import env
+from fabric.state import env, output
 from fabric.tasks import execute
 from fabric.colors import red, yellow, green, cyan
 
@@ -96,8 +96,17 @@ def get_fabric_hosts(nodes):
   return hosts
 
 
+def set_flags(args):
+  env.verbose = args.verbose
+  env.debug   = args.debug
+  env.cache   = args.cache
+  if args.fab_debug:
+    output.debug = True
+
+
 def drubs(args):
 
+  set_flags(args)
   load_config_file(args.file)
 
   # If 'all' has been supplied as the only item for the 'nodes' parameter, set
