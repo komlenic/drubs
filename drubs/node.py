@@ -104,7 +104,6 @@ class Node(object):
     self.print_elapsed_time()
 
 
-
   def update(self):
     '''
     Updataes a site/project, based on .make and .py configuration files.
@@ -116,6 +115,10 @@ class Node(object):
     '''
     Disables a site using Drupal's maintenance mode.
     '''
+    print(cyan('Disabling site...'))
+    with env.cd(env.node['site_root']):
+      self.drush('vset maintenance_mode 1')
+      self.drush('cc all')
     self.print_elapsed_time()
 
 
@@ -123,6 +126,10 @@ class Node(object):
     '''
     Enables a site by disabling Drupal's maintenance mode.
     '''
+    print(cyan('Enabling site...'))
+    with env.cd(env.node['site_root']):
+      self.drush('vset maintenance_mode 0')
+      self.drush('cc all')
     self.print_elapsed_time()
 
 
