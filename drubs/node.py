@@ -1,7 +1,7 @@
 import subprocess
 import time
 from fabric.state import env
-from fabric.operations import local
+from fabric.operations import local, put
 from fabric.api import lcd, cd, run, task, hosts, quiet, runs_once
 from os.path import isfile, dirname, basename, normpath, exists as local_exists
 from os import getcwd
@@ -101,6 +101,8 @@ class Node(object):
     Installs a site/project, based on .make and .py configuration files.
     '''
     self.provision()
+    self.make()
+    self.site_install()
     self.print_elapsed_time()
 
 
@@ -189,6 +191,55 @@ class Node(object):
       self.drubs_run('chmod -R u+w %s/sites/default' % (env.node['site_root']))
       self.drubs_run('rm -rf %s' % (env.node['site_root']))
     self.drubs_run('mkdir -p %s' % (env.node['site_root']))
+
+
+  def make(self):
+    '''
+    Runs drush make using the make file specified in project configs.
+    '''
+    print(cyan('Beginning drush make...'))
+    with env.cd(env.node['site_root']):
+      if env.exists(env.node['site_root'] + '/sites/default'):
+        self.drubs_run('chmod 775 sites/default')
+      make_file = env.config_dir + '/' + env.node['make_file']
+
+      if env.host_is_local:
+        make_file = env.config_dir + '/' + env.node['make_file']
+        self.drush('make --working-copy --no-gitinfofile --no-cache %s' % (
+          make_file,
+        ))
+      else:
+        # Copy drush make file for the node to /tmp on the node.
+        put(make_file, '/tmp')
+        # Run drush make.
+        self.drush('make --working-copy --no-gitinfofile --no-cache /tmp/%s' % (
+          env.node['make_file'],
+        ))
+        # Remove drush make file from /tmp on the node.
+        self.drubs_run('rm -rf /tmp/%s' % (env.node['make_file']))
+
+
+  def site_install(self):
+    '''
+    Runs drush site install.
+    '''
+    db_url = 'mysql://%s:%s@%s/%s' % (
+      env.node['db_user'],
+      env.node['db_pass'],
+      env.node['db_host'],
+      env.node['db_name'],
+    )
+    with env.cd(env.node['site_root']):
+      print(cyan('Beginning drush site-install...'))
+      self.drush('si --account-name="%s" --account-pass="%s" --account-mail="%s" --site-mail="%s" --db-url="%s" --site-name="%s"' % (
+        env.node['account_name'],
+        env.node['account_pass'],
+        env.node['account_mail'],
+        env.node['site_mail'],
+        db_url,
+        env.node['site_name'],
+      ))
+      self.drubs_run('chmod 775 sites/default/files')
 
 
   def print_elapsed_time(self):
