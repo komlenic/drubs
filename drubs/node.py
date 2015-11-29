@@ -174,6 +174,33 @@ class Node(object):
       self.drubs_run('drush %s -y' % (cmd))
 
 
+  def drush_sql(self, sql):
+    '''
+    Runs a drush-sql command with the provided sql query.
+
+    This function was historically necessary to be able to write one query that
+    could be escaped properly in order to be performed successfully on both
+    local and remote nodes.  Between python, fabric, shell, and drush, escaping
+    is difficult to grok.
+
+    This function is included as-is for now to accomodate already written config
+    files for existing projects, but it should be rewritten when escaping can
+    be properly understood.  (Encoding queries with base64 in transit may be
+    helpful.)
+    '''
+    if env.host_is_local:
+      sql = sql.replace('"', '\\\\\"')
+    else:
+      sql = sql.replace('"', '\\"')
+    options = str()
+    if env.verbose:
+      options += ' -v'
+    if env.debug:
+      options += ' -d'
+    with env.cd(env.node['site_root']):
+      self.drubs_run(r'drush sql-query "%s" %s -y' % (sql, options))
+
+
   def provision(self):
     '''
     Creates database and site root.
