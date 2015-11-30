@@ -103,6 +103,7 @@ class Node(object):
     self.provision()
     self.make()
     self.site_install()
+    self.secure()
     self.print_elapsed_time()
 
 
@@ -110,6 +111,8 @@ class Node(object):
     '''
     Updataes a site/project, based on .make and .py configuration files.
     '''
+    self.make()
+    self.secure()
     self.print_elapsed_time()
 
 
@@ -267,6 +270,15 @@ class Node(object):
         env.node['site_name'],
       ))
       self.drubs_run('chmod 775 sites/default/files')
+
+
+  def secure(self):
+    print(cyan('Performing security practices...'))
+    with env.cd(env.node['site_root']):
+      # Remove all txt files in site root (except robots.txt)
+      self.drubs_run('ls | grep .txt | grep -v "robots.txt" | xargs rm -rf')
+      # Ensure restrictive settings on settings.php
+      self.drubs_run('chmod 444 sites/default/settings.php')
 
 
   def print_elapsed_time(self):
