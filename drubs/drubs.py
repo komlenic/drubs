@@ -112,7 +112,7 @@ def drubs(args):
   # If 'all' has been supplied as the only item for the 'nodes' parameter, set
   # 'nodes' to a list of all nodes found in the project config file.
   if len(args.nodes) == 1 and args.nodes[0] == 'all':
-    args.nodes = env.config['nodes']
+    args.nodes = env.config['nodes'].keys()
 
   check_config_requirements_per_node(args.nodes)
 
