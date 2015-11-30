@@ -18,4 +18,5 @@ registered trademark of Dries Buytaert.
 
 Drubs is presently in pre-alpha development and not suitable for public use.
 
-For more information email drubs@drubs.org or follow @drubscli on twitter.
+For more information email drubs@drubs.org or follow
+[@drubscli](https://twitter.com/drubscli) on twitter.
