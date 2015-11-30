@@ -1,9 +1,10 @@
 import subprocess
 import time
+import sys
 from fabric.state import env
 from fabric.operations import local, put
 from fabric.api import lcd, cd, run, task, hosts, quiet, runs_once
-from os.path import isfile, dirname, basename, normpath, exists as local_exists
+from os.path import isfile, dirname, basename, normpath, splitext, exists as local_exists
 from os import getcwd
 from fabric.contrib.files import exists as remote_exists
 from fabric.colors import red, yellow, green, cyan
@@ -43,6 +44,12 @@ class Node(object):
 
     # Start a timer, used later by print_elapsed_time().
     env.start_time = time.time()
+
+    # Append the configs directory for the specified project to the python path.
+    sys.path.append(env.config_dir)
+
+    # Import attributes/functions from the appropriate config script.
+    self.config_script = __import__(splitext(env.node['py_file'])[0])
 
 
   def drubs_run(self, cmd, *args, **kwargs):
@@ -102,7 +109,9 @@ class Node(object):
     '''
     self.provision()
     self.make()
+    self.preconfigure()
     self.site_install()
+    self.postconfigure()
     self.secure()
     self.print_elapsed_time()
 
@@ -112,6 +121,7 @@ class Node(object):
     Updataes a site/project, based on .make and .py configuration files.
     '''
     self.make()
+    self.postconfigure()
     self.secure()
     self.print_elapsed_time()
 
@@ -273,12 +283,29 @@ class Node(object):
 
 
   def secure(self):
+    '''
+    Performs some security best-practices.
+    '''
     print(cyan('Performing security practices...'))
     with env.cd(env.node['site_root']):
       # Remove all txt files in site root (except robots.txt)
       self.drubs_run('ls | grep .txt | grep -v "robots.txt" | xargs rm -rf')
       # Ensure restrictive settings on settings.php
       self.drubs_run('chmod 444 sites/default/settings.php')
+
+
+  def preconfigure(self):
+    '''
+    Runs the pre() config script from the node's specified py_file setting.
+    '''
+    self.config_script.pre()
+
+
+  def postconfigure(self):
+    '''
+    Runs the post() config script from the node's specified py_file setting.
+    '''
+    self.config_script.post()
 
 
   def print_elapsed_time(self):
