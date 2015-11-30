@@ -235,9 +235,14 @@ class Node(object):
         self.drubs_run('chmod 775 sites/default')
       make_file = env.config_dir + '/' + env.node['make_file']
 
+      cache_option = str()
+      if not env.cache:
+        cache_option += ' --no-cache'
+
       if env.host_is_local:
         make_file = env.config_dir + '/' + env.node['make_file']
-        self.drush('make --working-copy --no-gitinfofile --no-cache %s' % (
+        self.drush('make --working-copy --no-gitinfofile %s %s' % (
+          cache_option,
           make_file,
         ))
       else:
