@@ -3,11 +3,6 @@ from fabric.api import task
 from fabric.state import env
 
 @task
-def init():
-  instance = node.Node(env)
-  instance.init()
-
-@task
 def status():
   instance = node.Node(env)
   instance.status()

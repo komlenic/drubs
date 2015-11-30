@@ -90,14 +90,6 @@ class Node(object):
         return k
 
 
-  def init(self):
-    '''
-    Creates stubbed-out versions of project configuration files.
-    '''
-    pass
-    self.print_elapsed_time()
-
-
   def status(self):
     self.drubs_run('uname')
     self.print_elapsed_time()
