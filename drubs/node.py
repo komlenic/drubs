@@ -99,12 +99,14 @@ class Node(object):
     '''
     Installs a site/project, based on .make and .py configuration files.
     '''
+    self.put_files()
     self.provision()
     self.make()
     self.preconfigure()
     self.site_install()
     self.postconfigure()
     self.secure()
+    self.remove_files()
     self.print_elapsed_time()
 
 
@@ -112,9 +114,11 @@ class Node(object):
     '''
     Updataes a site/project, based on .make and .py configuration files.
     '''
+    self.put_files()
     self.make()
     self.postconfigure()
     self.secure()
+    self.remove_files()
     self.print_elapsed_time()
 
 
@@ -303,6 +307,32 @@ class Node(object):
     Runs the post() config script from the node's specified py_file setting.
     '''
     self.config_script.post()
+
+
+  def put_files(self):
+    '''
+    Copies the 'files' directory to /tmp location.
+    '''
+    print(cyan('Copying project files...'))
+    self.drubs_run('mkdir -p /tmp/%s/files' % (env.config['project_settings']['project_name']))
+    if env.host_is_local:
+      self.drubs_run('cp -R %s/files/* /tmp/%s/files/' % (
+        env.config_dir,
+        env.config['project_settings']['project_name'],
+      ))
+    else:
+      put(
+        '%s/files/*' % (env.config_dir),
+        '/tmp/%s/files/' % (env.config['project_settings']['project_name'])
+      )
+
+
+  def remove_files(self):
+    '''
+    Removes temporarily copied files (if any).
+    '''
+    print(cyan('Removing project files...'))
+    self.drubs_run('rm -rf /tmp/%s' % (env.config['project_settings']['project_name']))
 
 
   def print_elapsed_time(self):
