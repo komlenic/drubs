@@ -203,6 +203,9 @@ def drubs_init(args):
   for node in args.nodes:
     local('cp %s/templates/d%s.py %s.py' % (env.drubs_data_dir, env.drupal_core_version, node))
 
+  # Make a 'files' directory.
+  local('mkdir files')
+
   # Create a .gitignore file for the config repo.
   print(cyan("Setting up gitignore file..."))
   local('cp %s/templates/gitignore.txt .gitignore' % (env.drubs_data_dir))
