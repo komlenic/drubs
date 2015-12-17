@@ -1,12 +1,15 @@
 import yaml
 import tasks
-from os.path import isfile, dirname, abspath, join, basename, normpath
+from os.path import isfile, isdir, dirname, abspath, join, basename, normpath, realpath
 from os import getcwd
 from fabric.state import env, output
 from fabric.tasks import execute
 from fabric.colors import red, yellow, green, cyan
 from fabric.contrib.console import confirm
+from fabric.api import lcd
 from fabric.operations import local, prompt
+
+from pprint import pprint
 
 
 def load_config_file(config_file):
@@ -147,26 +150,45 @@ def drubs_init(args):
   if pwd = the project config directory.  With -f pwd should be able to be
   anything.
   '''
+  project = dict()
+
+  if args.file == 'project.yml':
+    # No -f option supplied (or 'project.yml' supplied to -f).
+    project['location'] = realpath(normpath(getcwd()))
+    project['config_filename'] = 'project.yml'
+  else:
+    # -f option supplied and not 'project.yml'.
+    project['location'] = dirname(realpath(normpath(args.file)))
+    project['config_filename'] = basename(realpath(normpath(args.file)))
+
+  project['name'] = basename(normpath(project['location']))
+  project['config_file_abs_path'] = join(project['location'], project['config_filename'])
+
   # If file exists, ask for confirmation before overwriting.
   if isfile(args.file):
-    if not confirm(yellow("STOP! A project config file named '%s' already exists in the current directory. Overwrite?" % args.file), default=False):
-      print(cyan('Exiting...'))
+    if not confirm(yellow("STOP! A project config file named '%s' already exists. Overwrite?" % args.file), default=False):
+      print(yellow('Exiting...'))
       exit(0)
 
-  if not confirm(yellow("You are about to create a project named '%s'.  Proceed?") % basename(normpath(getcwd())), default=False):
-    print(cyan('Exiting...'))
-    exit(0)
+  if not isdir(project['location']):
+    if confirm(yellow("'%s' location does not already exist.  Create it and proceed?") % project['location'], default=True):
+      print(cyan("Creating '%s'...") % (project['location']))
+      local('mkdir -p %s' % (project['location']))
 
   # Ask which drupal core version this project will use.
   prompt(yellow("What major version of Drupal will this project use? (6,7,8)"), key="drupal_core_version", validate=r'^[6,7,8]{1}$', default="7")
 
   # Create config file.
-  print(cyan("Creating a new project config file named '%s' file in current directory with nodes %s..." % (args.file, args.nodes)))
+  print(cyan("Creating a new project config file named '%s' file in '%s' with node(s) %s..." % (
+    project['config_filename'],
+    project['location'],
+    args.nodes
+  )))
   node_output = dict()
   for node in args.nodes:
     node_output[node] = dict(
       db_host = 'localhost',
-      db_name = basename(normpath(getcwd())),
+      db_name = project['name'],
       db_user = '',
       db_pass = '',
       server_host = '',
@@ -184,37 +206,48 @@ def drubs_init(args):
   data = dict(
     nodes = node_output,
     project_settings = dict (
-      project_name = basename(normpath(getcwd())),
+      project_name = project['name'],
       drupal_core_version = env.drupal_core_version,
       central_config_repo = '',
     )
   )
-  with open(args.file, 'w') as outfile:
+
+  with open(project['config_file_abs_path'], 'w') as outfile:
     outfile.write('# Drubs config file\n')
     outfile.write(yaml.dump(data, default_flow_style=False, default_style='"'))
 
-  # Create make files.
-  print(cyan("Creating drush make files..."))
-  for node in args.nodes:
-    local('cp %s/templates/d%s.make %s.make' % (env.drubs_data_dir, env.drupal_core_version, node))
+  with lcd(project['location']):
 
-  # Create py files.
-  print(cyan("Creating python files..."))
-  for node in args.nodes:
-    local('cp %s/templates/d%s.py %s.py' % (env.drubs_data_dir, env.drupal_core_version, node))
+    # Create make files.
+    print(cyan("Creating drush make files..."))
+    for node in args.nodes:
+      local('cp %s/templates/d%s.make %s.make' % (
+        env.drubs_data_dir,
+        env.drupal_core_version,
+        node
+      ))
 
-  # Make a 'files' directory.
-  local('mkdir files')
+    # Create py files.
+    print(cyan("Creating python files..."))
+    for node in args.nodes:
+      local('cp %s/templates/d%s.py %s.py' % (
+        env.drubs_data_dir,
+        env.drupal_core_version,
+        node
+      ))
 
-  # Create a .gitignore file for the config repo.
-  print(cyan("Setting up gitignore file..."))
-  local('cp %s/templates/gitignore.txt .gitignore' % (env.drubs_data_dir))
+    # Make a 'files' directory.
+    local('mkdir files')
 
-  # Create a new repository and commit all config files.
-  print(cyan("Creating new repository for the project..."))
-  local('git init')
-  local('git add .')
-  local('git commit -m "Initial commit." --author="Drubs <>" --quiet')
+    # Create a .gitignore file for the config repo.
+    print(cyan("Setting up gitignore file..."))
+    local('cp %s/templates/gitignore.txt .gitignore' % (env.drubs_data_dir))
 
-  print(green("Complete.  Before proceeding with further operations such as installing this project, you should manually edit the configuration files (particularly '%s')." % args.file))
+    # Create a new repository and commit all config files.
+    print(cyan("Creating new repository for the project..."))
+    local('git init')
+    local('git add .')
+    local('git commit -m "Initial commit." --author="Drubs <>" --quiet')
+
+  print(green("Complete.  Before proceeding with further operations such as installing this project, you should manually edit the configuration files (particularly '%s')." % (project['config_file_abs_path'])))
   exit(0)
