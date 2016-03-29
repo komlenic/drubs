@@ -246,7 +246,7 @@ def drubs_init(args):
     # Create a new repository and commit all config files.
     print(cyan("Creating new repository for the project..."))
     local('git init')
-    local('git add .')
+    local('git add -A .')
     local('git commit -m "Initial commit." --author="Drubs <>" --quiet')
 
   print(green("Complete.  Before proceeding with further operations such as installing this project, you should manually edit the configuration files (particularly '%s')." % (project['config_file_abs_path'])))
