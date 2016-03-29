@@ -148,12 +148,22 @@ class python {
 
 
 class drush {
-  exec { "clone_drush":
+  exec { "install_drush":
     unless => "/usr/bin/command -v drush",
     command => "/bin/wget -P /tmp http://files.drush.org/drush.phar && /bin/chmod +x /tmp/drush.phar && /bin/mv /tmp/drush.phar /usr/local/bin/drush",
     require => [Package["php55w"],Package["wget"]],
   }
 }
+
+
+class drubs {
+  exec { "install_drubs":
+    unless => "/usr/bin/command -v drubs",
+    command => "/usr/bin/pip install git+https://github.com/komlenic/drubs.git",
+    require => Package["python-pip"],
+  }
+}
+
 
 include yum_repos
 include misc
@@ -162,3 +172,4 @@ include php
 include mysql
 include python
 include drush
+include drubs
