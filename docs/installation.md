@@ -44,6 +44,7 @@ Distribution/version-specific installation instructions are provided below.
     wget https://centos6.iuscommunity.org/ius-release.rpm -v -O ius-install.rpm
     sudo rpm -Uvh ius-install.rpm
     sudo rm ius-install.rpm
+    yum -y install python27 python27-devel python27-pip python27-setuptools python27-virtualenv --enablerepo=ius
     ```
 
 2. Clone this project and install using pip2.7:
