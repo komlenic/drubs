@@ -1,4 +1,4 @@
-# Updating pre-Drubs projects to use Drubs
+# Updating legacy (pre-Drubs) projects to use Drubs
 
 This documentation is only for projects that existed prior to the development of
 Drubs (using similar, more primitive scripts and tools).  If you don't know why
