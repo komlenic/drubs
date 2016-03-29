@@ -19,12 +19,32 @@ Generically, drubs requires the following:
 
 Distribution/version-specific installation instructions are provided below.
 
-### CentOS 7 / RHEL 7
+---
 
-1.  Install dependencies.  A [puppet manifest](puppet/drubs_centos7.pp) exists
-    for CentOS 7 / RHEL 7, which you can use to quickly install all dependencies
-    (recommended).  Please note that additional configuration may be necessary
-    for secure operation on publicly available and/or production nodes.
+## CentOS 7 / RHEL 7
+
+### Installing Drubs using Puppet
+
+1.  Install puppet in standalone mode (recommended).
+
+    ```bash
+    rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm
+    yes | yum -y install puppet
+    ```
+
+2.  Install all dependencies and Drubs using the provided
+    [CentOS 7 puppet manifest](puppet/drubs_centos7.pp).  Please note that
+    additional configuration will be necessary for secure operation on publicly
+    available and/or production nodes.  This manifest is supplied to ease
+    installation of Drubs - it is not a complete server setup solution.
+
+    ```bash
+    sudo puppet apply drubs_centos7.pp
+    ```
+
+### Installing Drubs manually
+
+1.  Install dependencies.
 
 2.  Clone drubs project and install using pip:
 
@@ -33,7 +53,9 @@ Distribution/version-specific installation instructions are provided below.
     sudo pip install -e ./drubs
     ```
 
-### CentOS 6 / RHEL 6
+---
+
+## CentOS 6 / RHEL 6
 
 1.  Install dependencies.
 
@@ -54,7 +76,9 @@ Distribution/version-specific installation instructions are provided below.
     sudo pip2.7 install -e ./drubs
     ```
 
-### All others
+---
+
+## All others
 
 1.  Install dependencies.
 
