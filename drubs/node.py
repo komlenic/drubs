@@ -37,7 +37,10 @@ class Node(object):
       env.forward_agent = True
 
     # Set env.files_dir, the absolute path to the project's files dir.
-    env.files_dir = env.config_dir + '/files'
+    if env.host_is_local:
+      env.files_dir = env.config_dir + '/files'
+    else:
+      env.files_dir = '/tmp/' + env.config['project_settings']['project_name'] + '/files'
 
     # Get node name from host.
     env.node_name = self.get_node(env.config['nodes'], env.host)
