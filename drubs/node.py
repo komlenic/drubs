@@ -198,9 +198,9 @@ class Node(object):
     helpful.)
     '''
     if env.host_is_local:
-      sql = sql.replace('"', '\\\\\"')
-    else:
       sql = sql.replace('"', '\\"')
+    else:
+      sql = sql.replace('"', '\\\\\"')
     options = str()
     if env.verbose:
       options += ' -v'
