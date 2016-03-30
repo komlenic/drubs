@@ -50,20 +50,44 @@ you would need this information, you probably don't need it.
     the default files that 'drubs init' created, or copy/paste the contents of
     the previously existing files into the files that 'drubs init' created.
 
-8.  Convert the .py files for use with Drubs using the provided bash script:
+8.  Convert .py files.
 
-    [convert_py_files.sh](util/convert_py_files.sh)
+    * Run the provided bash script:
 
-    For easiest usage, copy this script into your project/config repository and
-    execute it:
+        [convert_py_files.sh](util/convert_py_files.sh)
 
-    ```bash
-    # You may need to make the script executable.
-    chmod +x convert_py_files.sh
-    # Convert the .py files.
-    ./convert_py_files.sh
-    ```
+        For easiest usage, copy this script into your project/config repository
+        and execute it:
 
-    Additionally, you may need to correct any pathing issues in your .py files
-    to scripts, data import files, etc, as these files and directories now
-    reside in the 'files' directory. (See #6 above.)
+        ```bash
+        # You may need to make the script executable.
+        chmod +x convert_py_files.sh
+        # Convert the .py files.
+        ./convert_py_files.sh
+        ```
+
+    * Correct any pathing issues in your .py files to scripts,
+        data import files, etc, as these files and directories now reside in the
+        'files' directory of your project repository. (See #6 above.)
+        Previously, absolute paths were most likely used.  Convert any of these
+        paths such that they begin with the 'env.files_dir', and concatenate the
+        remaining portion of the path.  These changes make .py file lines
+        perfectly portable between nodes. (Previously you may have had to
+        specify different paths on different nodes.)  Examples below:
+
+        ```python
+        # Old way.
+        drush('scr --script-path=/space/devsite/configs/foobar/scripts/ set_private_file_directory')
+        # New way.
+        drush('scr --script-path=' + env.files_dir + '/scripts/ set_private_file_directory')
+
+        # Old way.
+        drush('feeds-import my_content --file=/path/to/configs/myproject/import/data.csv')
+        # New way.
+        drush('feeds-import my_content --file=' + env.files_dir + '/import/data.csv')
+        ```
+
+9.  If you haven't been commiting these changes all along, commit them now to
+    the 'drubs' branch.  Optionally, you may wish to merge the drubs branch
+    back into the master branch.  The project should now be able to be built and
+    maintained with Drubs.
