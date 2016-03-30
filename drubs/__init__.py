@@ -16,7 +16,7 @@ def main():
     formatter_class=argparse.RawDescriptionHelpFormatter,
     description=textwrap.dedent('''\
 
-      Drubs 0.1.0
+      Drubs 0.2.0
 
         A command-line tool tool for building, deploying, and managing Drupal
         sites across multiple servers and environments.
@@ -58,7 +58,7 @@ def main():
   parser.add_argument('-d', '--debug', action='store_const', const=True, default=False, help='print debug output from drush commands, if available')
   parser.add_argument('-c', '--cache', action='store_const', const=True, default=False, help='use drush cache of projects when building sites, where available')
   parser.add_argument('-D', '--fab_debug', action='store_const', const=True, default=False, help='print fabric debug messages')
-  parser.add_argument('--version', action='version', version='%(prog)s 0.1.0')
+  parser.add_argument('--version', action='version', version='%(prog)s 0.2.0')
 
   # Print help if no arguments are supplied.
   if len(sys.argv)==1:
