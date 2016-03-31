@@ -158,7 +158,6 @@ class drush {
 
 class drubs {
   exec { "install_drubs":
-    unless => "/usr/bin/command -v drubs",
     command => "/usr/bin/pip install -e git+https://github.com/komlenic/drubs.git#egg=Drubs",
     require => Package["python-pip"],
   }
