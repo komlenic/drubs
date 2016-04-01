@@ -230,7 +230,7 @@ class Node(object):
     ))
     print(cyan('Creating site root location...'))
     if env.exists(env.node['site_root'] + '/sites/default'):
-      self.drubs_run('chmod -R u+w %s/sites/default' % (env.node['site_root']))
+      self.drubs_run('chmod u+w %s/sites/default' % (env.node['site_root']))
       self.drubs_run('rm -rf %s' % (env.node['site_root']))
     self.drubs_run('mkdir -p %s' % (env.node['site_root']))
 
