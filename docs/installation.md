@@ -13,7 +13,7 @@ Generically, drubs requires the following:
 * apache 2+
 * php 5.5+
 * mysql 5.6+ (MariaDB should work also, untested)
-* python 2.7+ and fabric 2
+* python 2.7+ and fabric 1.x
 * drush 8+
 * git
 
