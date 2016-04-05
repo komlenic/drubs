@@ -250,20 +250,24 @@ class Node(object):
         cache_option += ' --no-cache'
 
       if env.host_is_local:
-        make_file = env.config_dir + '/' + env.node['make_file']
         self.drush('make --working-copy --no-gitinfofile %s %s' % (
           cache_option,
           make_file,
         ))
       else:
         # Copy drush make file for the node to /tmp on the node.
-        put(make_file, '/tmp')
+        put(make_file, '/tmp/' + env.config['project_settings']['project_name'])
         # Run drush make.
-        self.drush('make --working-copy --no-gitinfofile --no-cache /tmp/%s' % (
+        self.drush('make --working-copy --no-gitinfofile %s /tmp/%s/%s' % (
+          cache_option,
+          env.config['project_settings']['project_name'],
           env.node['make_file'],
         ))
         # Remove drush make file from /tmp on the node.
-        self.drubs_run('rm -rf /tmp/%s' % (env.node['make_file']))
+        self.drubs_run('rm -rf /tmp/%s/%s' % (
+          env.config['project_settings']['project_name'],
+          env.node['make_file'],
+        ))
 
 
   def site_install(self):
