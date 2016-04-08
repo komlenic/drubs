@@ -113,6 +113,7 @@ class Node(object):
     self.postconfigure()
     self.secure()
     self.remove_files()
+    self.drush('cc all')
     self.print_elapsed_time()
 
 
@@ -125,6 +126,7 @@ class Node(object):
     self.postconfigure()
     self.secure()
     self.remove_files()
+    self.drush('cc all')
     self.print_elapsed_time()
 
 
