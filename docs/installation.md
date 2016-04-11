@@ -49,8 +49,7 @@ Distribution/version-specific installation instructions are provided below.
 2.  Clone drubs project and install using pip:
 
     ```bash
-    git clone https://github.com/komlenic/drubs.git
-    sudo pip install -e ./drubs
+    pip install -e git+https://github.com/komlenic/drubs.git
     ```
 
 ---
@@ -72,8 +71,7 @@ Distribution/version-specific installation instructions are provided below.
 2. Clone this project and install using pip2.7:
 
     ```bash
-    git clone https://github.com/komlenic/drubs.git
-    sudo pip2.7 install -e ./drubs
+    pip2.7 install -e git+https://github.com/komlenic/drubs.git
     ```
 
 ---
@@ -85,6 +83,5 @@ Distribution/version-specific installation instructions are provided below.
 2.  Clone drubs project and install using pip:
 
     ```bash
-    git clone https://github.com/komlenic/drubs.git
-    sudo pip install -e ./drubs
+    pip install -e git+https://github.com/komlenic/drubs.git
     ```
