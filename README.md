@@ -16,7 +16,8 @@ registered trademark of Dries Buytaert.
 
 ## Installation
 
-Please see the [installation instructions](docs/installation.md).
+Please see the [installation instructions](docs/installation.md) and
+[system configuration docs](docs/system_configuration.md).
 
 ## Usage
 
