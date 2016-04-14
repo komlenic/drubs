@@ -51,3 +51,24 @@ printf "[Service]\nUMask=0002" >> /etc/systemd/system/httpd.service.d/umask.conf
 # Reboot the server.
 reboot
 ```
+
+## Configuring Apache
+
+### Setting AccessFileName
+
+In order to reliably disable access to a site during the process of building
+(installing or updating) a site, Drubs places an additional configuration file
+in the site's root directory, and later removes it.  To take advantage of this
+feature, you should set `AccessFileName` in 'httpd.conf' to:
+
+```
+AccessFileName .htaccess.drubs .htaccess
+```
+
+If the `AccessFileName` directive is already set, modify it as above; otherwise
+you may need to add it.
+
+If you do not set this directive, and do not make other provision to take the
+site offline during build, be aware that users may see a broken or partially-
+built site, and may be able to interact with it while it is being built, in ways
+which may cause the build to fail.

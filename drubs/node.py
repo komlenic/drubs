@@ -105,6 +105,7 @@ class Node(object):
     '''
     Installs a site/project, based on .make and .py configuration files.
     '''
+    self.disable_apache_access()
     self.put_files()
     self.provision()
     self.make()
@@ -114,6 +115,7 @@ class Node(object):
     self.secure()
     self.remove_files()
     self.drush('cc all')
+    self.enable_apache_access()
     self.print_elapsed_time()
 
 
@@ -121,12 +123,14 @@ class Node(object):
     '''
     Updataes a site/project, based on .make and .py configuration files.
     '''
+    self.disable_apache_access()
     self.put_files()
     self.make()
     self.postconfigure()
     self.secure()
     self.remove_files()
     self.drush('cc all')
+    self.enable_apache_access()
     self.print_elapsed_time()
 
 
@@ -232,8 +236,9 @@ class Node(object):
     ))
     print(cyan('Creating site root location...'))
     if env.exists(env.node['site_root'] + '/sites/default'):
-      self.drubs_run('chmod u+w %s/sites/default' % (env.node['site_root']))
-      self.drubs_run('rm -rf %s' % (env.node['site_root']))
+      with env.cd(env.node['site_root']):
+        self.drubs_run('chmod u+w sites/default')
+        self.drubs_run('ls -A | grep -v ".htaccess.drubs" | xargs rm -rf')
     self.drubs_run('mkdir -p %s' % (env.node['site_root']))
 
 
@@ -345,6 +350,36 @@ class Node(object):
     '''
     print(cyan('Removing project files...'))
     self.drubs_run('rm -rf /tmp/%s' % (env.config['project_settings']['project_name']))
+
+
+  def disable_apache_access(self):
+    '''
+    Disables access to site root location.
+
+    Used to temporarily return 503 during site install/update.
+    '''
+    print(cyan('Temporarily disabling access to site...'))
+    if env.host_is_local:
+      self.drubs_run('cp %s/templates/.htaccess.drubs %s' % (
+        env.drubs_data_dir,
+        env.node['site_root'],
+      ))
+    else:
+      put(
+        '%s/templates/.htaccess.drubs' % (env.drubs_data_dir),
+        '%s/' % (env.node['site_root'])
+      )
+
+
+  def enable_apache_access(self):
+    '''
+    Re-enables access to site root location.
+
+    Used to remove 503 put in place during site install/upgrade.
+    '''
+    print(cyan('Re-enabling access to site...'))
+    if env.exists(env.node['site_root'] + '/.htaccess.drubs'):
+      self.drubs_run('rm %s/.htaccess.drubs' % (env.node['site_root']))
 
 
   def print_elapsed_time(self):

@@ -1,0 +1,4 @@
+ErrorDocument 503 "This site is temporarily unavailable, please try again in a few moments."
+RewriteEngine On
+Header always set Retry-After "1800"
+RewriteRule .* - [R=503]
