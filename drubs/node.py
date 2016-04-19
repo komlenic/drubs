@@ -114,6 +114,8 @@ class Node(object):
     self.postconfigure()
     self.secure()
     self.remove_files()
+    # The order/flow below is important.
+    self.drush('updb')
     self.drush('cc all')
     self.enable_apache_access()
     self.print_elapsed_time()
@@ -129,6 +131,8 @@ class Node(object):
     self.postconfigure()
     self.secure()
     self.remove_files()
+    # The order/flow below is important.
+    self.drush('updb')
     self.drush('cc all')
     self.enable_apache_access()
     self.print_elapsed_time()
