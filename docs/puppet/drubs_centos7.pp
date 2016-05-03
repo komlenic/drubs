@@ -36,6 +36,9 @@ class misc {
   package { "subversion":
     ensure => present,
   }
+  package { "gcc":
+    ensure => present,
+  }
 }
 
 
@@ -159,7 +162,7 @@ class drush {
 class drubs {
   exec { "install_drubs":
     command => "/usr/bin/pip install -e git+https://github.com/komlenic/drubs.git#egg=Drubs",
-    require => Package["python-pip"],
+    require => [Package["python-pip"],Package["gcc"]],
   }
 }
 
