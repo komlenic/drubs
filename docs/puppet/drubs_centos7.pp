@@ -45,7 +45,6 @@ class misc {
 class httpd {
   file { "/var/www/html":
     ensure => directory,
-    recurse => true,
   }
   package { "httpd":
     ensure => present,
