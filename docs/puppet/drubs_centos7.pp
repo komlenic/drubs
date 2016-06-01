@@ -43,7 +43,7 @@ class misc {
 
 
 class httpd {
-  file { "/var/www/html":
+  file { ["/var/www", "/var/www/html"]:
     ensure => directory,
   }
   package { "httpd":
