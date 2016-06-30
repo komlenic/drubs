@@ -337,7 +337,7 @@ class Node(object):
     print(cyan('Copying project files...'))
     self.drubs_run('mkdir -p /tmp/%s/files' % (env.config['project_settings']['project_name']))
     if env.host_is_local:
-      self.drubs_run('cp -R %s/files/* /tmp/%s/files/' % (
+      self.drubs_run('cp -R %s/files/ /tmp/%s/' % (
         env.config_dir,
         env.config['project_settings']['project_name'],
       ))
