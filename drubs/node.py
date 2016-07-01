@@ -363,8 +363,9 @@ class Node(object):
     Used to temporarily return 503 during site install/update.
     '''
     print(cyan('Temporarily disabling access to site...'))
+    self.drubs_run('mkdir -p %s' % (env.node['site_root']))
     if env.host_is_local:
-      self.drubs_run('cp %s/templates/.htaccess.drubs %s' % (
+      self.drubs_run('cp %s/templates/.htaccess.drubs %s/' % (
         env.drubs_data_dir,
         env.node['site_root'],
       ))
