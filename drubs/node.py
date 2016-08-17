@@ -343,8 +343,8 @@ class Node(object):
       ))
     else:
       put(
-        '%s/files/*' % (env.config_dir),
-        '/tmp/%s/files/' % (env.config['project_settings']['project_name'])
+        '%s/files/' % (env.config_dir),
+        '/tmp/%s/' % (env.config['project_settings']['project_name'])
       )
 
 
