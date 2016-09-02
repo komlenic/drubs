@@ -260,6 +260,10 @@ class Node(object):
       if not env.cache:
         cache_option += ' --no-cache'
 
+      # Remove all modules/themes/libraries to ensure any deleted files are
+      # removed.  See: https://github.com/komlenic/drubs/issues/30
+      self.drubs_run('rm -rf sites/all/*')
+
       if env.host_is_local:
         self.drush('make --working-copy --no-gitinfofile %s %s' % (
           cache_option,
