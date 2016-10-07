@@ -23,25 +23,28 @@ def main():
 
       Available actions:
 
-        init     Create a new project with the specified nodes
-        status   Return some status information about the specified nodes
-        install  Install the project on the specified nodes (destroys any
-                   existing site)
-        update   Update the project on the specified nodes (data safe*)
-        disable  Put specified nodes into Drupal's 'maintenance mode'
+        init     Create a new project with the specified nodes.
+        status   Return some status information about the specified node.  Also
+                   accepts the keyword 'all' as an argument to get the status of
+                   all specified nodes in project.yml.
+        install  Install the project on the specified node (destroys any
+                   existing site).
+        update   Update the project on the specified node (data safe*).
+        disable  Put specified node into Drupal's 'maintenance mode'.
         enable   Turns off Drupal's maintenance mode (if on)
-        destroy  Completely deletes the project from the specified nodes
+        destroy  Completely deletes the project from the specified node.
 
       Example commands:
 
-        drubs install myserver1
-          - perform the install action on myserver1
+        drubs init dev testing staging prod
+          - create a new Drubs project in the current directory, with the nodes
+            'dev', 'testing', 'staging', and 'prod'
 
-        drubs install myserver1 myserver2
-          - perform the install action on myserver1 AND myserver2
+        drubs install staging
+          - perform the install action on the node named 'staging'
 
-        drubs install all
-          - perform the install action on all nodes found in project.yml
+        drubs status all
+          - perform the status action on all nodes found in project.yml
 
         drubs -f /home/me/new_project/foo.yml install myserver1
           - perform the install action on myserver1, without pwd currently
@@ -51,8 +54,8 @@ def main():
         '''),
     epilog='http://drubs.org'
   )
-  parser.add_argument('action', choices=['init', 'install', 'update', 'destroy', 'enable', 'disable', 'var_dump', 'status'], help='The action to perform on the specified nodes. (see descriptions above)', metavar='action')
-  parser.add_argument('nodes', nargs='+', help='one or more nodes, or "all" which will perform the specified action on all valid nodes found in project.yml')
+  parser.add_argument('action', choices=['init', 'install', 'update', 'destroy', 'enable', 'disable', 'var_dump', 'status'], help='The action to perform on the specified node. (see descriptions above)', metavar='action')
+  parser.add_argument('nodes', nargs='+', help='The node name to perform the specified action on.  Note that \'init\' action accepts multiple node names.')
   parser.add_argument('-f', '--file', default='project.yml', help='path to project.yml file (not necessary if pwd contains the project.yml file)')
   parser.add_argument('-v', '--verbose', action='store_const', const=True, default=False, help='print verbose output from drush commands, if available')
   parser.add_argument('-d', '--debug', action='store_const', const=True, default=False, help='print debug output from drush commands, if available')

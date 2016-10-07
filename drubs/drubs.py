@@ -120,14 +120,31 @@ def drubs(args):
 
   set_flags(args)
 
-  if(args.action == 'init'):
+  if args.action == 'init':
     drubs_init(args)
   else:
+    # Return error if more than one node is specified.
+    if len(args.nodes) > 1:
+      if args.action == 'status':
+        print(red("More than one node parameter specified.  Please specify exactly one node name (or the keyword 'all' to get the status of all nodes). Exiting..."))
+      else:
+        print(red("More than one node parameter specified.  Please specify exactly one node name. Exiting..."))
+      exit(1)
+
+    # Return error if 'all' keyword is being attempted to be used on any action
+    # other than 'status'.
+    if args.action != 'status' and args.nodes[0] == 'all':
+      print(red("Cannot use the keyword 'all' with the action '%s' Exiting..." % (
+        args.action,
+        )
+      ))
+      exit(1)
+
     load_config_file(args.file)
 
-    # If 'all' has been supplied as the only item for the 'nodes' parameter, set
-    # 'nodes' to a list of all nodes found in the project config file.
-    if len(args.nodes) == 1 and args.nodes[0] == 'all':
+    # If 'all' has been supplied for the 'nodes' parameter, set 'nodes' to a
+    # list of all nodes found in the project config file.
+    if args.nodes[0] == 'all':
       args.nodes = env.config['nodes'].keys()
 
     check_config_requirements_per_node(args.nodes)
