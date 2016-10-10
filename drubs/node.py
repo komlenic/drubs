@@ -105,6 +105,7 @@ class Node(object):
     '''
     Installs a site/project, based on .make and .py configuration files.
     '''
+    self.check_destructive_action_protection()
     self.disable_apache_access()
     self.put_files()
     self.provision()
@@ -123,7 +124,7 @@ class Node(object):
 
   def update(self):
     '''
-    Updataes a site/project, based on .make and .py configuration files.
+    Updates a site/project, based on .make and .py configuration files.
     '''
     self.disable_apache_access()
     self.put_files()
@@ -161,6 +162,7 @@ class Node(object):
 
 
   def destroy(self):
+    self.check_destructive_action_protection()
     print(cyan('Removing database...'))
     self.drubs_run('mysql -h%s -u%s -p%s -e "DROP DATABASE IF EXISTS %s";' % (
       env.node['db_host'],
@@ -389,6 +391,83 @@ class Node(object):
     print(cyan('Re-enabling access to site...'))
     if env.exists(env.node['site_root'] + '/.htaccess.drubs'):
       self.drubs_run('rm %s/.htaccess.drubs' % (env.node['site_root']))
+
+
+  def check_destructive_action_protection(self):
+    '''
+    Prevents execution if destructive action protection is 'on' for the node.
+    '''
+    if env.node['destructive_action_protection'] == 'on':
+
+      if self.site_bootstrapped():
+        print(red("Destructive action protection is 'on' for node '%s', and '%s' task is potentially destructive. A properly functioning site appears to already exist. Exiting..." % (
+          env.node_name,
+          env.command,
+        )))
+        exit(1)
+
+      if self.site_files_exist() or self.site_database_exists():
+        print(red("Destructive action protection is 'on' for node '%s', and '%s' task is potentially destructive. An installed site does not appear to be functioning properly, but files OR the site database seem to be present.  For more information, run 'drubs status <node>' or 'drubs status all'.  Exiting..." % (
+          env.node_name,
+          env.command,
+        )))
+        exit(1)
+
+
+  def site_bootstrapped(self):
+    '''
+    Determines if a bootstrapped drupal site exists.
+
+    Returns 1 if the site is bootstrapped, 0 otherwise.
+    '''
+    if not env.exists(env.node['site_root']):
+      return 0
+    with env.cd(env.node['site_root']):
+      result = self.drubs_run('drush status --fields=bootstrap --no-field-labels', capture=True)
+      if (result.find('Successful') != -1):
+        return 1
+      else:
+        return 0
+
+
+  def site_files_exist(self):
+    '''
+    Determines if the site files exist.
+
+    Returns 1 if site files exist, 0 otherwise.
+    '''
+    if env.exists(env.node['site_root']) and env.exists(env.node['site_root'] + '/index.php'):
+      return 1
+    else:
+      return 0
+
+
+  def site_database_exists(self):
+    '''
+    Determines if the database exists.
+
+    Returns 1 if the site database exists and contains tables, 0 otherwise.
+    @todo: remove replacement of mysql command line password warnings in favor
+    of mysql_config_editor tools.
+    '''
+    status = self.drubs_run('mysql -u %s -p%s -h %s -ss -e "SHOW DATABASES LIKE \'%s\'"' % (
+      env.node['db_user'],
+      env.node['db_pass'],
+      env.node['db_host'],
+      env.node['db_name'],
+    ), capture=True)
+    status.replace('Warning: Using a password on the command line interface can be insecure.', '')
+    if status != '':
+      table_count = self.drubs_run('mysql -u %s -p%s -h %s -ss -e "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = \'%s\'"' % (
+        env.node['db_user'],
+        env.node['db_pass'],
+        env.node['db_host'],
+        env.node['db_name'],
+      ), capture=True)
+      table_count.replace('Warning: Using a password on the command line interface can be insecure.', '')
+      if table_count > 0:
+        return 1
+    return 0
 
 
   def print_elapsed_time(self):
