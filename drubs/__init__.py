@@ -63,7 +63,7 @@ def main():
   parser.add_argument('-v', '--verbose', action='store_const', const=True, default=False, help='print verbose output from drush commands, if available')
   parser.add_argument('-d', '--debug', action='store_const', const=True, default=False, help='print debug output from drush commands, if available')
   parser.add_argument('-c', '--cache', action='store_const', const=True, default=False, help='use drush cache of projects when building sites, where available')
-  parser.add_argument('-D', '--fab_debug', action='store_const', const=True, default=False, help='print fabric debug messages')
+  parser.add_argument('-D', '--fab-debug', action='store_const', const=True, default=False, help='print fabric debug messages')
   parser.add_argument('--version', action='version', version='%(prog)s 0.2.0')
 
   # Print help if no arguments are supplied.
