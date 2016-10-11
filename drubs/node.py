@@ -174,6 +174,7 @@ class Node(object):
     Creates a drush archive dump backup of the site.
     '''
     self.create_backup()
+    self.remove_old_backups()
     self.print_elapsed_time()
 
 
