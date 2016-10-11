@@ -268,6 +268,7 @@ def drubs_init(args):
 
     # Make a 'files' directory.
     local('mkdir files')
+    local('touch files/.gitignore')
 
     # Create a .gitignore file for the config repo.
     print(cyan("Setting up gitignore file..."))
