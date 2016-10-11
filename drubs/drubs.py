@@ -62,6 +62,9 @@ def check_config_requirements_per_node(nodes):
       'account_mail',
       'account_name',
       'account_pass',
+      'backup_directory',
+      'backup_lifetime_days',
+      'backup_minimum_count',
       'db_host',
       'db_name',
       'db_pass',
@@ -104,9 +107,14 @@ def get_fabric_hosts(nodes):
 
 
 def set_flags(args):
-  env.verbose = args.verbose
-  env.debug   = args.debug
-  env.cache   = args.cache
+  env.verbose    = args.verbose
+  env.debug      = args.debug
+  env.cache      = args.cache
+  env.no_backup  = args.no_backup
+  env.no_restore = args.no_restore
+  # If --no-backup is set, also always set --no-restore.
+  if env.no_backup:
+    env.no_restore = True
   if args.fab_debug:
     output.debug = True
 
@@ -210,6 +218,9 @@ def drubs_init(args):
       db_user = '',
       db_pass = '',
       destructive_action_protection = 'off',
+      backup_directory = "",
+      backup_lifetime_days = "30",
+      backup_minimum_count = "3",
       server_host = '',
       site_root = '',
       server_user = '',

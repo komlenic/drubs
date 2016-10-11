@@ -33,6 +33,11 @@ def destroy():
   instance.destroy()
 
 @task
+def backup():
+  instance = node.Node(env)
+  instance.backup()
+
+@task
 def var_dump():
   instance = node.Node(env)
   instance.var_dump()

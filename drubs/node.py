@@ -1,11 +1,15 @@
 import subprocess
 import time
 import sys
+import glob
 from fabric.state import env
 from fabric.operations import local, put
 from fabric.api import lcd, cd, run, task, hosts, quiet, runs_once
 from os.path import isfile, dirname, basename, normpath, splitext, exists as local_exists
 from os import getcwd
+from re import search
+from contextlib import contextmanager
+from datetime import datetime, timedelta
 from fabric.contrib.files import exists as remote_exists
 from fabric.colors import red, yellow, green, cyan
 from pprint import pprint
@@ -107,17 +111,19 @@ class Node(object):
     '''
     self.check_destructive_action_protection()
     self.disable_apache_access()
-    self.put_files()
-    self.provision()
-    self.make()
-    self.preconfigure()
-    self.site_install()
-    self.postconfigure()
-    self.secure()
-    self.remove_files()
-    # The order/flow below is important.
-    self.drush('updb')
-    self.drush('cc all')
+    self.check_and_create_backup()
+    with self.cleanup_on_failure():
+      self.put_files()
+      self.provision()
+      self.make()
+      self.preconfigure()
+      self.site_install()
+      self.postconfigure()
+      self.secure()
+      self.remove_files()
+      # The order/flow below is important.
+      self.drush('updb')
+      self.drush('cc all')
     self.enable_apache_access()
     self.print_elapsed_time()
 
@@ -127,14 +133,16 @@ class Node(object):
     Updates a site/project, based on .make and .py configuration files.
     '''
     self.disable_apache_access()
-    self.put_files()
-    self.make()
-    self.postconfigure()
-    self.secure()
-    self.remove_files()
-    # The order/flow below is important.
-    self.drush('updb')
-    self.drush('cc all')
+    self.check_and_create_backup()
+    with self.cleanup_on_failure():
+      self.put_files()
+      self.make()
+      self.postconfigure()
+      self.secure()
+      self.remove_files()
+      # The order/flow below is important.
+      self.drush('updb')
+      self.drush('cc all')
     self.enable_apache_access()
     self.print_elapsed_time()
 
@@ -161,8 +169,17 @@ class Node(object):
     self.print_elapsed_time()
 
 
+  def backup(self):
+    '''
+    Creates a drush archive dump backup of the site.
+    '''
+    self.create_backup()
+    self.print_elapsed_time()
+
+
   def destroy(self):
     self.check_destructive_action_protection()
+    self.check_and_create_backup()
     print(cyan('Removing database...'))
     self.drubs_run('mysql -h%s -u%s -p%s -e "DROP DATABASE IF EXISTS %s";' % (
       env.node['db_host'],
@@ -470,6 +487,97 @@ class Node(object):
     return 0
 
 
+  def check_and_create_backup(self):
+    '''
+    Creates a site backup and removes old backups.
+    '''
+    if not env.no_backup:
+      self.create_backup()
+    self.remove_old_backups()
+
+
+  def create_backup(self):
+    '''
+    Creates a drush archive dump backup of a site.
+    '''
+    if self.site_bootstrapped():
+      print(cyan('Creating site backup...'))
+      with env.cd(env.node['site_root']):
+        if not env.exists(env.node['backup_directory']):
+          self.drubs_run('mkdir -p %s' % (env.node['backup_directory']))
+        self.drush('cc all')
+        self.drush('archive-dump --destination="%s/%s_%s.tar.gz" --preserve-symlinks' % (
+          env.node['backup_directory'],
+          time.strftime("%Y-%m-%d_%H-%M-%S"),
+          env.node_name,
+        ))
+    else:
+      print(cyan('No pre-existing properly-functioning site found.  Skipping backup...'))
+
+
+  def restore_latest_backup(self):
+    '''
+    Restores a drush archive dump backup of a site.
+    '''
+    print(cyan('Restoring latest site backup...'))
+    with env.cd(env.node['backup_directory']):
+
+      # Get a list of available backup files sorted with newest first.
+      backup_files = glob.glob(env.node['backup_directory'] + '/*.tar.gz')
+      backup_files.sort(reverse=True)
+
+      # If backup files exist, restore the latest backup file.
+      if len(backup_files) > 0:
+        latest_backup_file = backup_files[0]
+        if env.exists(latest_backup_file):
+          if not env.exists(env.node['site_root']):
+            self.drubs_run('mkdir -p %s' % (env.node['site_root']))
+          with env.cd(env.node['site_root']):
+            self.drush('archive-restore %s --overwrite' % (
+              latest_backup_file,
+            ))
+            self.drush('cc all')
+            print(green("Latest backup '%s' restored to '%s' on node '%s'..." % (
+              latest_backup_file,
+              env.node['site_root'],
+              env.node_name,
+            )))
+        else:
+          print(red("Latest backup file does not exist or cannot be read in '%s' on node '%s'..." % (
+            env.node['backup_directory'],
+            env.node_name,
+          )))
+      else:
+        print(red("No backup files found in '%s' on node '%s'.  Cannot restore..." % (
+          env.node['backup_directory'],
+          env.node_name,
+        )))
+
+
+  def remove_old_backups(self):
+    '''
+    Removes existing backup files based on the node's backup settings.
+    '''
+    print(cyan("Checking for site backups to be removed..."))
+
+    # Get a list of available backup files sorted with newest first.
+    backup_files = glob.glob(env.node['backup_directory'] + '/*.tar.gz')
+    backup_files.sort(reverse=True)
+
+    # Exclude the first n items from the list, where n is backup_minimum_count.
+    del backup_files[:int(env.node['backup_minimum_count'])]
+
+    # Delete any remaining backup files in the list that are older than
+    # backup_lifetime_days, if the list still has backups in it.
+    if len(backup_files) > 0:
+      for backup_filename in backup_files:
+        match = search(r'\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}', backup_filename)
+        backup_time = datetime.strptime(match.group(), '%Y-%m-%d_%H-%M-%S')
+        now = datetime.now()
+        if backup_time < (now - timedelta(days=int(env.node['backup_lifetime_days']))):
+          self.drubs_run('rm -f %s' % (backup_filename))
+
+
   def print_elapsed_time(self):
     '''
     Prints the elapsed time.
@@ -478,3 +586,22 @@ class Node(object):
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
     print(cyan("Elapsed time: %dh:%02dm:%02ds" % (h, m, s)))
+
+
+  @contextmanager
+  def cleanup_on_failure(self):
+    '''
+    Context wrapper for operations that cleans up on/after failure.
+    '''
+    try:
+      yield
+    except SystemExit:
+
+      # Restore site from backup if allowed by command options.
+      if not env.no_restore:
+        self.restore_latest_backup()
+      else:
+        print(yellow("Command was executed with the '--no-backup' or '--no-restore' option.  No site backup has been restored..."))
+
+      # Remove temporarily copied files if they still exist.
+      self.remove_files()

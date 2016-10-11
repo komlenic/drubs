@@ -31,7 +31,8 @@ def main():
                    existing site).
         update   Update the project on the specified node (data safe*).
         disable  Put specified node into Drupal's 'maintenance mode'.
-        enable   Turns off Drupal's maintenance mode (if on)
+        enable   Turns off Drupal's maintenance mode (if on).
+        backup   Create a new backup of the site on the specified node.
         destroy  Completely deletes the project from the specified node.
 
       Example commands:
@@ -54,9 +55,11 @@ def main():
         '''),
     epilog='http://drubs.org'
   )
-  parser.add_argument('action', choices=['init', 'install', 'update', 'destroy', 'enable', 'disable', 'var_dump', 'status'], help='The action to perform on the specified node. (see descriptions above)', metavar='action')
+  parser.add_argument('action', choices=['init', 'install', 'update', 'destroy', 'enable', 'disable', 'backup', 'var_dump', 'status'], help='The action to perform on the specified node. (see descriptions above)', metavar='action')
   parser.add_argument('nodes', nargs='+', help='The node name to perform the specified action on.  Note that \'init\' action accepts multiple node names.')
   parser.add_argument('-f', '--file', default='project.yml', help='path to project.yml file (not necessary if pwd contains the project.yml file)')
+  parser.add_argument('-r', '--no-restore', action='store_const', const=True, default=False, help='do not automatically restore the latest site backup on failure of install or update actions')
+  parser.add_argument('-b', '--no-backup', action='store_const', const=True, default=False, help='do not create site backup before install, update, or destroy actions. this option logically includes the \'--no-restore\' option')
   parser.add_argument('-v', '--verbose', action='store_const', const=True, default=False, help='print verbose output from drush commands, if available')
   parser.add_argument('-d', '--debug', action='store_const', const=True, default=False, help='print debug output from drush commands, if available')
   parser.add_argument('-c', '--cache', action='store_const', const=True, default=False, help='use drush cache of projects when building sites, where available')
