@@ -11,7 +11,7 @@ such as development, testing, staging, and production.  It is:
 * integratable - use Drubs with shell scripts, Jenkins/Hudson, Travis CI, or
     any other continuous integration tools
 
-The "Drubs" name is a hat-tip to the indespensible Drush.  Drupal is a
+The "Drubs" name is a hat-tip to the indispensable Drush.  Drupal is a
 registered trademark of Dries Buytaert.
 
 ## Installation
