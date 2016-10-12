@@ -507,10 +507,11 @@ class Node(object):
         if not env.exists(env.node['backup_directory']):
           self.drubs_run('mkdir -p %s' % (env.node['backup_directory']))
         self.drush('cc all')
-        self.drush('archive-dump --destination="%s/%s_%s.tar.gz" --preserve-symlinks' % (
+        self.drush('archive-dump --destination="%s/%s_%s_%s.tar.gz" --preserve-symlinks' % (
           env.node['backup_directory'],
-          time.strftime("%Y-%m-%d_%H-%M-%S"),
+          env.config['project_settings']['project_name'],
           env.node_name,
+          time.strftime("%Y-%m-%d_%H-%M-%S"),
         ))
     else:
       print(cyan('No pre-existing properly-functioning site found.  Skipping backup...'))
@@ -524,7 +525,11 @@ class Node(object):
     with env.cd(env.node['backup_directory']):
 
       # Get a list of available backup files sorted with newest first.
-      backup_files = glob.glob(env.node['backup_directory'] + '/*.tar.gz')
+      backup_files = glob.glob('%s/%s_%s_*.tar.gz' % (
+        env.node['backup_directory'],
+        env.config['project_settings']['project_name'],
+        env.node_name,
+      ))
       backup_files.sort(reverse=True)
 
       # If backup files exist, restore the latest backup file.
@@ -562,7 +567,11 @@ class Node(object):
     print(cyan("Checking for site backups to be removed..."))
 
     # Get a list of available backup files sorted with newest first.
-    backup_files = glob.glob(env.node['backup_directory'] + '/*.tar.gz')
+    backup_files = glob.glob('%s/%s_%s_*.tar.gz' % (
+      env.node['backup_directory'],
+      env.config['project_settings']['project_name'],
+      env.node_name,
+    ))
     backup_files.sort(reverse=True)
 
     # Exclude the first n items from the list, where n is backup_minimum_count.
