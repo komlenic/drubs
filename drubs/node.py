@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 from fabric.contrib.files import exists as remote_exists
 from fabric.colors import red, yellow, green, cyan
+from prettytable import PrettyTable
 from pprint import pprint
 
 
@@ -101,7 +102,7 @@ class Node(object):
 
 
   def status(self):
-    self.drubs_run('uname')
+    self.status_per_node()
     self.print_elapsed_time()
 
 
@@ -586,6 +587,78 @@ class Node(object):
         now = datetime.now()
         if backup_time < (now - timedelta(days=int(env.node['backup_lifetime_days']))):
           self.drubs_run('rm -f %s' % (backup_filename))
+
+
+  def get_requirement_version(self, check_command, version_command):
+    '''
+    Gets the version for software if it exists.
+    '''
+    requirement = self.drubs_run(check_command, capture=True)
+    if (requirement.return_code == 0):
+      version = self.drubs_run(version_command, capture=True)
+    else:
+      version = red("Missing")
+    return version
+
+
+  def get_requirement_versions_per_node(self):
+    '''
+    Returns requirement versions.
+    '''
+    req = dict()
+    req['drush']  = self.get_requirement_version("command -v drush >/dev/null 2>&1", "drush --version --pipe")
+    req['git']    = self.get_requirement_version("command -v git >/dev/null 2>&1", "git --version | awk '{ print $3 }'")
+    req['php']    = self.get_requirement_version("command -v php >/dev/null 2>&1", "php --version | head -n 1 | awk '{ print $2 }'")
+    req['mysql']  = self.get_requirement_version("command -v php >/dev/null 2>&1", "mysql --version|awk '{ print $5 }'|awk -F\, '{ print $1 }'")
+    req['python'] = self.get_requirement_version("command -v python >/dev/null 2>&1", "python -c 'import sys; print(\".\".join(map(str, sys.version_info[:3])))'")
+    req['fabric'] = self.get_requirement_version("command -v fab >/dev/null 2>&1", "fab --version | head -n 1 | awk '{ print $2 }'")
+    req['apache'] = self.get_requirement_version("command -v apachectl >/dev/null 2>&1", "apachectl -v | head -n 1 | awk '{ print $3 }'")
+    return req
+
+
+  def status_per_node(self):
+    '''
+    Prints status information per node.
+    '''
+    status_table = PrettyTable(['Property', 'Value'])
+    status_table.align = "l"
+
+    with quiet():
+
+      status_table.add_row(['Node name', env.node_name])
+      status_table.add_row(['Hostname', env.node['server_host']])
+
+      if self.site_bootstrapped():
+        bootstrap = green('yes')
+      else:
+        bootstrap = red('no')
+      status_table.add_row(['Site bootstrap', bootstrap])
+
+      if self.site_database_exists():
+        database = green('yes')
+      else:
+        database = red('no')
+      status_table.add_row(['Database exists', database])
+
+      if self.site_files_exist():
+        files = green('yes')
+      else:
+        files = red('no')
+      status_table.add_row(['Site files exist', files])
+
+      distro = self.drubs_run('lsb_release -ds 2>/dev/null || cat /etc/*release 2>/dev/null | head -n1 || uname -om', capture=True)
+      status_table.add_row(['Server OS', distro])
+
+      req = self.get_requirement_versions_per_node()
+      status_table.add_row(['Apache version', req['apache']])
+      status_table.add_row(['PHP version', req['php']])
+      status_table.add_row(['MySQL client version', req['mysql']])
+      status_table.add_row(['Drush version', req['drush']])
+      status_table.add_row(['Git version', req['git']])
+      status_table.add_row(['Python version', req['python']])
+      status_table.add_row(['Fabric version', req['fabric']])
+
+    print status_table
 
 
   def print_elapsed_time(self):
