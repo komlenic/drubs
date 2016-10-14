@@ -58,6 +58,7 @@ def main():
   parser.add_argument('action', choices=['init', 'install', 'update', 'destroy', 'enable', 'disable', 'backup', 'var_dump', 'status'], help='The action to perform on the specified node. (see descriptions above)', metavar='action')
   parser.add_argument('nodes', nargs='+', help='The node name to perform the specified action on.  Note that \'init\' action accepts multiple node names.')
   parser.add_argument('-f', '--file', default='project.yml', help='path to project.yml file (not necessary if pwd contains the project.yml file)')
+  parser.add_argument('-y', '--yes', action='store_const', const=True, default=False, help='automatically respond to any confirmations in the affirmative')
   parser.add_argument('-r', '--no-restore', action='store_const', const=True, default=False, help='do not automatically restore the latest site backup on failure of install or update actions')
   parser.add_argument('-b', '--no-backup', action='store_const', const=True, default=False, help='do not create site backup before install, update, or destroy actions. this option logically includes the \'--no-restore\' option')
   parser.add_argument('-v', '--verbose', action='store_const', const=True, default=False, help='print verbose output from drush commands, if available')

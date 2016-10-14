@@ -112,6 +112,7 @@ def set_flags(args):
   env.cache      = args.cache
   env.no_backup  = args.no_backup
   env.no_restore = args.no_restore
+  env.yes        = args.yes
   # If --no-backup is set, also always set --no-restore.
   if env.no_backup:
     env.no_restore = True

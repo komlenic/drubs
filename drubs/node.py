@@ -10,6 +10,7 @@ from os import getcwd
 from re import search
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from fabric.contrib.console import confirm
 from fabric.contrib.files import exists as remote_exists
 from fabric.colors import red, yellow, green, cyan
 from prettytable import PrettyTable
@@ -432,11 +433,22 @@ class Node(object):
         exit(1)
 
       if self.site_files_exist() or self.site_database_exists():
-        print(red("Destructive action protection is 'on' for node '%s', and '%s' task is potentially destructive. An installed site does not appear to be functioning properly, but files OR the site database seem to be present.  For more information, run 'drubs status <node>' or 'drubs status all'.  Exiting..." % (
+        print(red("Destructive action protection is 'on' for node '%s', and '%s' task is potentially destructive. An installed site does not appear to be functioning properly, but files OR the site database seem to be present.  For more information, run 'drubs status %s' or 'drubs status all'.  Exiting..." % (
           env.node_name,
           env.command,
+          env.node_name,
         )))
         exit(1)
+
+    else:
+      if env.no_backup and int(env.node['backup_minimum_count']) == 0 and int(env.node['backup_lifetime_days']) == 0:
+        if not env.yes:
+          if not confirm(yellow("The requested operation may cause irreversible loss of data or code on node '%s'. The command has been executed using the '--no-backup' option; and 'backup_minimum_count' as well as 'backup_lifetime_days' are set to 0 for node '%s'. Continue?" % (
+            env.node_name,
+            env.node_name,
+          )), default=False):
+            print(cyan('Exiting...'))
+            exit(0)
 
 
   def site_bootstrapped(self):
