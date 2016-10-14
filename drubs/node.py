@@ -125,6 +125,8 @@ class Node(object):
       # The order/flow below is important.
       self.drush('updb')
       self.drush('cc all')
+    if not env.no_backup:
+      self.remove_old_backups()
     self.enable_apache_access()
     self.print_elapsed_time()
 
@@ -144,6 +146,8 @@ class Node(object):
       # The order/flow below is important.
       self.drush('updb')
       self.drush('cc all')
+    if not env.no_backup:
+      self.remove_old_backups()
     self.enable_apache_access()
     self.print_elapsed_time()
 
@@ -197,6 +201,8 @@ class Node(object):
       print(yellow('Site root %s does not exist.  Nothing to remove.' % (
         env.node['site_root'],
       )))
+    if not env.no_backup:
+      self.remove_old_backups()
     self.print_elapsed_time()
 
 
@@ -491,11 +497,10 @@ class Node(object):
 
   def check_and_create_backup(self):
     '''
-    Creates a site backup and removes old backups.
+    Creates a site backup.
     '''
     if not env.no_backup:
       self.create_backup()
-    self.remove_old_backups()
 
 
   def create_backup(self):
@@ -685,6 +690,10 @@ class Node(object):
         self.restore_latest_backup()
       else:
         print(yellow("Command was executed with the '--no-backup' or '--no-restore' option.  No site backup has been restored..."))
+
+      # Remove old backups unless --no-backup option was set.
+      if not env.no_backup:
+        self.remove_old_backups()
 
       # Remove temporarily copied files if they still exist.
       self.remove_files()
