@@ -32,7 +32,7 @@ Distribution/version-specific installation instructions are provided below.
     yes | yum -y install puppet
     ```
 
-2.  Install all dependencies and Drubs using the provided
+2.  Install all dependencies and the latest release of Drubs using the provided
     [CentOS 7 puppet manifest](puppet/drubs_centos7.pp).  Please note that
     additional configuration will be necessary for secure operation on publicly
     available and/or production nodes.  This manifest is supplied to ease
@@ -46,10 +46,14 @@ Distribution/version-specific installation instructions are provided below.
 
 1.  Install dependencies.
 
-2.  Clone drubs project and install using pip:
+2.  Install or update using pip:
 
     ```bash
-    pip install -e git+https://github.com/komlenic/drubs.git#egg=Drubs
+    # To install or update to the latest release:
+    pip install -I git+https://github.com/komlenic/drubs.git@0.3.0#egg=Drubs
+
+    # To install or update to the latest commit or "tip":
+    pip install -I git+https://github.com/komlenic/drubs.git#egg=Drubs
     ```
 
 ---
@@ -68,10 +72,14 @@ Distribution/version-specific installation instructions are provided below.
     yum -y install python27 python27-devel python27-pip python27-setuptools python27-virtualenv --enablerepo=ius
     ```
 
-2. Clone this project and install using pip2.7:
+2. Install or update using pip2.7:
 
     ```bash
-    pip2.7 install -e git+https://github.com/komlenic/drubs.git#egg=Drubs
+    # To install or update to the latest release:
+    pip2.7 install -I git+https://github.com/komlenic/drubs.git@0.3.0#egg=Drubs
+
+    # To install or update to the latest commit or "tip":
+    pip2.7 install -I git+https://github.com/komlenic/drubs.git#egg=Drubs
     ```
 
 ---
@@ -80,8 +88,12 @@ Distribution/version-specific installation instructions are provided below.
 
 1.  Install dependencies.
 
-2.  Clone drubs project and install using pip:
+2.  Install or update using pip:
 
     ```bash
-    pip install -e git+https://github.com/komlenic/drubs.git#egg=Drubs
+    # To install or update to the latest release:
+    pip install -I git+https://github.com/komlenic/drubs.git@0.3.0#egg=Drubs
+
+    # To install or update to the latest commit or "tip":
+    pip install -I git+https://github.com/komlenic/drubs.git#egg=Drubs
     ```
