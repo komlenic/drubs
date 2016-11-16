@@ -161,7 +161,7 @@ class drush {
 
 class drubs {
   exec { "install_drubs":
-    command => "/usr/bin/pip install -I git+https://github.com/komlenic/drubs.git@0.3.0#egg=Drubs",
+    command => "/usr/bin/pip install -I git+https://github.com/komlenic/drubs.git@0.3.1#egg=Drubs",
     require => [Package["python-pip"],Package["gcc"]],
   }
 }
