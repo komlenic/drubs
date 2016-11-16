@@ -50,7 +50,7 @@ Distribution/version-specific installation instructions are provided below.
 
     ```bash
     # To install or update to the latest release:
-    pip install -I git+https://github.com/komlenic/drubs.git@0.3.1#egg=Drubs
+    pip install -I git+https://github.com/komlenic/drubs.git@0.3.2#egg=Drubs
 
     # To install or update to the latest commit or "tip":
     pip install -I git+https://github.com/komlenic/drubs.git#egg=Drubs
@@ -76,7 +76,7 @@ Distribution/version-specific installation instructions are provided below.
 
     ```bash
     # To install or update to the latest release:
-    pip2.7 install -I git+https://github.com/komlenic/drubs.git@0.3.1#egg=Drubs
+    pip2.7 install -I git+https://github.com/komlenic/drubs.git@0.3.2#egg=Drubs
 
     # To install or update to the latest commit or "tip":
     pip2.7 install -I git+https://github.com/komlenic/drubs.git#egg=Drubs
@@ -92,7 +92,7 @@ Distribution/version-specific installation instructions are provided below.
 
     ```bash
     # To install or update to the latest release:
-    pip install -I git+https://github.com/komlenic/drubs.git@0.3.1#egg=Drubs
+    pip install -I git+https://github.com/komlenic/drubs.git@0.3.2#egg=Drubs
 
     # To install or update to the latest commit or "tip":
     pip install -I git+https://github.com/komlenic/drubs.git#egg=Drubs
