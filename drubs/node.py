@@ -403,8 +403,8 @@ class Node(object):
       ))
     else:
       put(
-        '%s/templates/.htaccess.drubs' % (env.drubs_data_dir),
-        '%s/' % (env.node['site_root'])
+        '%s/templates/htaccess.drubs' % (env.drubs_data_dir),
+        '%s/.htaccess.drubs' % (env.node['site_root'])
       )
 
 
