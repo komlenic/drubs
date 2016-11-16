@@ -66,9 +66,9 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'fabric<2',
-        'pyyaml',
-        'prettytable',
+        'fabric <2',
+        'pyyaml >3.0, <4.0',
+        'prettytable >=0.7.2',
     ],
 
     # List additional groups of dependencies here (e.g. development
