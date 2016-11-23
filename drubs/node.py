@@ -1,7 +1,6 @@
 import subprocess
 import time
 import sys
-import glob
 from fabric.state import env
 from fabric.operations import local, put
 from fabric.api import lcd, cd, run, task, hosts, quiet, runs_once
@@ -543,11 +542,12 @@ class Node(object):
     with env.cd(env.node['backup_directory']):
 
       # Get a list of available backup files sorted with newest first.
-      backup_files = glob.glob('%s/%s_%s_*.tar.gz' % (
+      backup_files = self.drubs_run('ls -1 %s/%s_%s_*.tar.gz' % (
         env.node['backup_directory'],
         env.config['project_settings']['project_name'],
         env.node_name,
-      ))
+      ), capture=True)
+      backup_files = backup_files.splitlines()
       backup_files.sort(reverse=True)
 
       # If backup files exist, restore the latest backup file.
@@ -585,11 +585,12 @@ class Node(object):
     print(cyan("Checking for site backups to be removed..."))
 
     # Get a list of available backup files sorted with newest first.
-    backup_files = glob.glob('%s/%s_%s_*.tar.gz' % (
+    backup_files = self.drubs_run('ls -1 %s/%s_%s_*.tar.gz' % (
       env.node['backup_directory'],
       env.config['project_settings']['project_name'],
       env.node_name,
-    ))
+    ), capture=True)
+    backup_files = backup_files.splitlines()
     backup_files.sort(reverse=True)
 
     # Exclude the first n items from the list, where n is backup_minimum_count.
