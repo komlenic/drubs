@@ -539,13 +539,19 @@ class Node(object):
     Restores a drush archive dump backup of a site.
     '''
     print(cyan('Restoring latest site backup...'))
+
+    # Make the backup directory if for some reason it doesn't already exist.
+    if not env.exists(env.node['backup_directory']):
+      self.drubs_run('mkdir -p %s' % (env.node['backup_directory']))
+
     with env.cd(env.node['backup_directory']):
 
       # Get a list of available backup files sorted with newest first.
-      backup_files = self.drubs_run('ls -1 %s/%s_%s_*.tar.gz' % (
+      backup_files = self.drubs_run("ls -1 %s | grep -E '%s_%s_[0-9]{4}\-[0-9]{2}\-[0-9]{2}_[0-9]{2}\-[0-9]{2}\-[0-9]{2}\.tar\.gz' | awk '{print \"%s/\" $0}'" % (
         env.node['backup_directory'],
         env.config['project_settings']['project_name'],
         env.node_name,
+        env.node['backup_directory'],
       ), capture=True)
       backup_files = backup_files.splitlines()
       backup_files.sort(reverse=True)
@@ -584,11 +590,16 @@ class Node(object):
     '''
     print(cyan("Checking for site backups to be removed..."))
 
+    # Make the backup directory if for some reason it doesn't already exist.
+    if not env.exists(env.node['backup_directory']):
+      self.drubs_run('mkdir -p %s' % (env.node['backup_directory']))
+
     # Get a list of available backup files sorted with newest first.
-    backup_files = self.drubs_run('ls -1 %s/%s_%s_*.tar.gz' % (
+    backup_files = self.drubs_run("ls -1 %s | grep -E '%s_%s_[0-9]{4}\-[0-9]{2}\-[0-9]{2}_[0-9]{2}\-[0-9]{2}\-[0-9]{2}\.tar\.gz' | awk '{print \"%s/\" $0}'" % (
       env.node['backup_directory'],
       env.config['project_settings']['project_name'],
       env.node_name,
+      env.node['backup_directory'],
     ), capture=True)
     backup_files = backup_files.splitlines()
     backup_files.sort(reverse=True)
