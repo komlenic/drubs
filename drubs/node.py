@@ -563,8 +563,9 @@ class Node(object):
           if not env.exists(env.node['site_root']):
             self.drubs_run('mkdir -p %s' % (env.node['site_root']))
           with env.cd(env.node['site_root']):
-            self.drush('archive-restore %s --overwrite' % (
+            self.drush('archive-restore %s --overwrite --destination="%s"' % (
               latest_backup_file,
+              env.node['site_root'],
             ))
             self.drush('cc all')
             print(green("Latest backup '%s' restored to '%s' on node '%s'..." % (
