@@ -23,7 +23,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version = '0.3.2',
+    version = '0.3.3',
 
     description = 'A command-line tool tool for building, deploying, and managing Drupal sites across multiple servers and environments.',
     long_description = long_description,
