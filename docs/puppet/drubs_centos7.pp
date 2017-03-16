@@ -139,13 +139,16 @@ class python {
   package { "PyYAML":
     ensure => present,
   }
-  package { "python-pip":
+  package { "python2-pip":
     ensure => present,
   }
-  exec { "install-fabric":
-    unless => "/usr/bin/command -v fab",
-    command => "/usr/bin/pip install fabric",
-    require => Package["python-pip"],
+  package { "openssl-devel":
+    ensure => present,
+  }
+  package { "fabric":
+    provider => "pip",
+    ensure => "1.13.1",
+    require => Package["python2-pip", "openssl-devel"],
   }
 }
 
@@ -162,7 +165,7 @@ class drush {
 class drubs {
   exec { "install_drubs":
     command => "/usr/bin/pip install -I git+https://github.com/komlenic/drubs.git@0.3.3#egg=Drubs",
-    require => [Package["python-pip"],Package["gcc"]],
+    require => [Package["python2-pip"],Package["gcc"]],
   }
 }
 
